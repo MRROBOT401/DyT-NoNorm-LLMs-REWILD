@@ -172,8 +172,6 @@ pip install -r requirements.txt
 Train a DyT-modified DistilGPT2 model on RE-WILD:
 
 ```bash
-# Install requirements
-pip install -r requirements.txt
 
 # Train on Alpaca with Vanilla DistilGPT2
 python scripts/train_alpaca_distillgpt2_vanilla.py
