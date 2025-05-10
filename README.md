@@ -85,8 +85,8 @@ Post-training large LLMs is computationally expensive, and normalization layers 
 ```
 
 ---
-##  Architecture
-![Architecture Diagram](plots/ChatGPT%20Image%20May%208%2C%202025%2C%2001_48_20%20PM.png)
+##  Workflow
+![Workflow Diagram](plots/workflow.png)
 
 ---
 ## Experimental Results
