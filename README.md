@@ -55,7 +55,6 @@ Post-training large LLMs is computationally expensive, and normalization layers 
 **Logged:**
 
 * Training and validation loss per 500 steps
-* Perplexity
 * Prompt response outputs
 * Inference time (Vanilla vs DyT)
 
