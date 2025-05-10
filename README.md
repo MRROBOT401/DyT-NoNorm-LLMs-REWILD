@@ -202,7 +202,7 @@ python scripts/train_selective_unfreeze_rewild.py
 
 ## Slides & Report
 
-* [📄 HPML Final Slides (PDF)](./report/Presentation.pdf)
+* [HPML Final Slides (PDF)](./report/Presentation.pdf)
 
 ---
 
