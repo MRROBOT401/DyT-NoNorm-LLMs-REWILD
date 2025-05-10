@@ -14,7 +14,12 @@ This repository contains the codebase, results, and plots for our final project 
 Post-training large LLMs is computationally expensive, and normalization layers like LayerNorm add complexity to training and inference. We investigate whether these layers can be replaced with a simpler alternative — **Dynamic Tanh (DyT)** — while maintaining performance.
 
 ---
+## Motivation
+- **Challenge**: Fine-tuning large LLMs is expensive and normalization layers like LayerNorm add architectural and runtime complexity.
+- **Goal**: Explore whether **DyT (Dynamic Tanh)** can replace LayerNorm and still allow effective post-training.
+- **Setup**: DistilGPT2 + PEFT (LoRA), trained across Alpaca, ShareGPT, and RE-WILD datasets.
 
+---
 ## Key Contributions
 
 * Replaced all `LayerNorm` layers in DistilGPT2 and Pythia with a learnable **Dynamic Tanh (DyT)** activation: `DyT(x) = tanh(\alpha x)`
@@ -50,7 +55,7 @@ Post-training large LLMs is computationally expensive, and normalization layers 
 **Logged:**
 
 * Training and validation loss per 500 steps
-* Perplexity (RE-WILD only)
+* Perplexity
 * Prompt response outputs
 * Inference time (Vanilla vs DyT)
 
@@ -66,6 +71,22 @@ Post-training large LLMs is computationally expensive, and normalization layers 
 
 * **Inference Time**: DyT = 77.05s, Vanilla = 77.46s → \~0.5% speedup
 * **Prompt Quality**: DyT generates literal, unstructured completions; vanilla preserves instruction-following and formatting better
+---
+
+## Repository Structure
+```bash
+├── data_utils/                # Dataset preprocessing, e.g. ShareGPT JSON
+├── notebooks/                # Training notebooks for all setups
+├── scripts/                  # Executable training scripts (.py)
+├── results/                  # Saved checkpoints
+├── plots/                    # Visualizations and graphs
+├── report/Presentation.pdf   # Final submitted report
+└── README.md                 # You're here
+```
+
+---
+##  Architecture
+![Architecture Diagram](plots/ChatGPT%20Image%20May%208%2C%202025%2C%2001_48_20%20PM.png)
 
 ---
 ## Experimental Results
@@ -151,15 +172,23 @@ pip install -r requirements.txt
 Train a DyT-modified DistilGPT2 model on RE-WILD:
 
 ```bash
-python scripts/train_rewild_dyt_selective_unfreeze.py --epochs 3 --lr 2e-5 --batch_size 8
+# Install requirements
+pip install -r requirements.txt
+
+# Train on Alpaca with Vanilla DistilGPT2
+python scripts/train_alpaca_distillgpt2_vanilla.py
+
+# Train on RE-WILD with DyT
+python scripts/train_selective_unfreeze_rewild.py
 ```
+---
 
-Run vanilla baseline on ShareGPT:
-
-```bash
-python scripts/train_sharegpt_vanilla.py --epochs 3
-```
-
+## Dependencies
+- `transformers`
+- `datasets`
+- `peft`
+- `torch`
+- `scipy`, `matplotlib`, `numpy`
 ---
 
 ## Observations
@@ -182,6 +211,17 @@ python scripts/train_sharegpt_vanilla.py --epochs 3
 * Try DyT with **LLaMA 3.2B** using larger batch sizes
 * Evaluate DyT with alternative norm-replacement functions
 * Integrate DyT into **quantized** or **sparsely activated** LLMs
+
+---
+##  Acknowledgements
+- HuggingFace Transformers & Datasets
+- Colab Pro for GPU access
+- HPML course instructors for project guidance
+
+---
+
+## License
+This project is part of academic coursework at NYU and released for research and educational use only.
 
 ---
 
