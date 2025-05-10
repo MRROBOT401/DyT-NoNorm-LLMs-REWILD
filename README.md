@@ -160,24 +160,51 @@ DyT-NoNorm-LLMs-REWILD/
 
 ---
 
-## How to Run
+### How to Run This Project
 
-Install requirements:
+#### Step 1: Install Requirements
+
+Install the necessary Python packages:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Train a DyT-modified DistilGPT2 model on RE-WILD:
+#### Step 2: Run the Notebooks 
 
-```bash
+Navigate to the `notebooks/` folder and run the following Jupyter notebooks in the recommended order:
 
-# Train on Alpaca with Vanilla DistilGPT2
-python scripts/train_alpaca_distillgpt2_vanilla.py
+1. **Benchmarks.ipynb**
+   ⤷ Overview and comparison plots between DyT and LayerNorm across datasets
 
-# Train on RE-WILD with DyT
-python scripts/train_selective_unfreeze_rewild.py
-```
+2. **modReWILDcreate.ipynb**
+   ⤷ Prepares and reformats RE-WILD dataset from HuggingFace JSON
+
+3. **pythia17m.ipynb**
+   ⤷ Fine-tuning DyT-modified Pythia-17M model
+
+4. **pythia410m.ipynb**
+   ⤷ Fine-tuning DyT-modified Pythia-410M model
+
+5. **train\_alpaca\_distillgpt2.ipynb**
+   ⤷ Fine-tunes DyT-based DistilGPT2 on the Alpaca dataset
+
+6. **train\_alpaca\_distillgpt2\_vanilla.ipynb**
+   ⤷ Fine-tunes baseline DistilGPT2 (LayerNorm) on Alpaca
+
+7. **train\_sharegpt.ipynb**
+   ⤷ Trains DyT vs. vanilla on ShareGPT conversational data
+
+8. **train\_selective\_unfreeze\_rewild.ipynb**
+   ⤷ Selective unfreezing DyT fine-tuning on RE-WILD
+
+
+Each notebook includes inline comments and cell outputs for reproducibility.
+If you're running on Colab or an HPC, ensure appropriate runtime (A100 recommended).
+
+For best results, execute all training notebooks sequentially and compare metrics in `Benchmarks.ipynb`.
+
+These notebooks can be run using JupyterLab, VS Code, or Google Colab.
 ---
 
 ## Dependencies
