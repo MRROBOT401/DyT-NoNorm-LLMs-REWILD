@@ -68,6 +68,62 @@ Post-training large LLMs is computationally expensive, and normalization layers 
 * **Prompt Quality**: DyT generates literal, unstructured completions; vanilla preserves instruction-following and formatting better
 
 ---
+## Experimental Results
+
+### 1. RE-WILD (Selective DyT Unfreezing)
+
+![RE-WILD](plots/DistilGPT2%20%2B%20LoRA%20on%20RE-WILD%20DyT%20(Selective%20Unfreeze)%20vs%20Vanilla.png)
+
+> DyT with selective unfreezing showed stagnated validation loss (~8.3), while vanilla continued to converge. Suggests DyT struggles under LoRA on high-entropy datasets.
+
+---
+
+### 2. ShareGPT
+
+![ShareGPT](plots/DistilGPT2%20Fine-Tuning%20on%20ShareGPT%20DyT%20vs%20Vanilla.png)
+
+> DyT (blue/orange) converges slower, with higher loss than vanilla. Simulated vanilla training reaches ~2.0 loss with stable gradients, demonstrating the benefits of LayerNorm.
+
+---
+
+### 3. Alpaca
+
+![Alpaca](plots/Loss%20Comparison%20%20DyT%20vs%20Vanilla%20DistilGPT2.png)
+
+> On a smaller instruction corpus, DyT retains basic convergence but exhibits noisy gradients and wider generalization gap compared to vanilla.
+
+---
+
+### 4. MT-Bench Inference Comparison
+
+![Inference Time](plots/Inference%20times.png)
+
+> DyT showed **0.5% faster inference** but drastically reduced preference on MT-bench judged outputs.
+
+---
+
+### 5. Pythia 410M: Train Loss
+
+![Pythia Loss](plots/train%20loss.png)
+
+> Larger models benefit more from DyT. Loss offset between DyT and vanilla reduces with model scale.
+
+---
+
+### 6. Gradient Norm (Pythia)
+
+![Gradient Norm](plots/train_grad_norm.png)
+
+> DyT introduces smoother gradients compared to noisy LayerNorm-free baselines, but requires tighter α tuning.
+
+---
+
+### 7. Token Accuracy
+
+![Token Accuracy](plots/trainmean_token_accuracy.png)
+
+> Vanilla maintains higher accuracy over training, but DyT still improves token-level predictions, especially in larger models.
+---
 
 ## Repository Structure
 
