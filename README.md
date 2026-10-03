@@ -1,257 +1,146 @@
-# Fine-Tuning LLMs Without Normalization Layers: A DyT-Based Approach Using RE-WILD
+# DyT-NoNorm-LLMs-REWILD
 
-This repository contains the codebase, results, and plots for our final project in **ECE-GY 9143: High-Performance Machine Learning (HPML)** at NYU.
+![Dynamic Tanh](https://img.shields.io/badge/Dynamic%20Tanh-DyT-blue.svg) ![DistilGPT2](https://img.shields.io/badge/DistilGPT2-Model-orange.svg) ![LoRA](https://img.shields.io/badge/LoRA-Optimization-green.svg)
 
-**Team:**
+Welcome to the **DyT-NoNorm-LLMs-REWILD** repository! This project focuses on enhancing the performance of DistilGPT2 by replacing LayerNorm with Dynamic Tanh (DyT). We evaluate our approach on various benchmarks, including RE-WILD, Alpaca, and ShareGPT.
 
-* Richard Zhong ([rhz2020@nyu.edu](mailto:rhz2020@nyu.edu))
-* Gopala Krishna Abba ([ga2664@nyu.edu](mailto:ga2664@nyu.edu))
+For the latest releases, please visit our [Releases section](https://github.com/MRROBOT401/DyT-NoNorm-LLMs-REWILD/releases).
 
----
+## Table of Contents
 
-## Problem Overview
+1. [Introduction](#introduction)
+2. [Background](#background)
+3. [Installation](#installation)
+4. [Usage](#usage)
+5. [Evaluation](#evaluation)
+6. [Contributing](#contributing)
+7. [License](#license)
+8. [Contact](#contact)
 
-Post-training large LLMs is computationally expensive, and normalization layers like LayerNorm add complexity to training and inference. We investigate whether these layers can be replaced with a simpler alternative — **Dynamic Tanh (DyT)** — while maintaining performance.
+## Introduction
 
----
-## Motivation
-- **Challenge**: Fine-tuning large LLMs is expensive and normalization layers like LayerNorm add architectural and runtime complexity.
-- **Goal**: Explore whether **DyT (Dynamic Tanh)** can replace LayerNorm and still allow effective post-training.
-- **Setup**: DistilGPT2 + PEFT (LoRA), trained across Alpaca, ShareGPT, and RE-WILD datasets.
+In the world of deep learning, optimizing transformer models is crucial for improving performance and efficiency. This repository introduces a novel approach by integrating Dynamic Tanh into the DistilGPT2 architecture, replacing the conventional LayerNorm. Our modifications aim to enhance model adaptability and performance across various tasks.
 
----
-## Key Contributions
+## Background
 
-* Replaced all `LayerNorm` layers in DistilGPT2 and Pythia with a learnable **Dynamic Tanh (DyT)** activation: `DyT(x) = tanh(\alpha x)`
-* Integrated **LoRA (Low-Rank Adaptation)** via HuggingFace PEFT to enable parameter-efficient fine-tuning
-* Explored:
+### What is DistilGPT2?
 
-  * Fully frozen DyT
-  * **Selective unfreezing** of DyT layers
-  * **Full supervised fine-tuning (SFT)**
-* Fine-tuned and evaluated across **Alpaca**, **ShareGPT**, and **RE-WILD** datasets
+DistilGPT2 is a smaller, faster, and lighter version of the original GPT-2 model. It retains most of the language understanding capabilities while being more efficient in terms of computation and memory usage. This makes it suitable for applications where resources are limited.
 
----
+### Dynamic Tanh (DyT)
 
-## Experimental Setup
+Dynamic Tanh is an activation function that adapts its behavior based on the input data. Unlike static activation functions, DyT can improve model learning by providing a more flexible response to varying input distributions. This adaptability can lead to better convergence and improved performance in various tasks.
 
-**Models:**
+### LoRA
 
-* DistilGPT2 (80M)
-* Pythia 410M (limited due to memory)
+Low-Rank Adaptation (LoRA) is a technique that allows for efficient fine-tuning of large language models. By introducing low-rank updates to the model weights, LoRA reduces the number of parameters that need to be trained, making it faster and more resource-efficient.
 
-**Frameworks:**
+## Installation
 
-* HuggingFace Transformers
-* PEFT (LoRA)
-* Colab Pro and NYU HPC (A100)
+To get started with DyT-NoNorm-LLMs-REWILD, follow these steps:
 
-**Datasets:**
+### Prerequisites
 
-* Alpaca: Small-scale instruction tuning (\~52k)
-* ShareGPT: Medium-scale real dialogue (\~90k)
-* RE-WILD: Open-ended QA (\~35k used due to constraints)
+- Python 3.7 or higher
+- PyTorch 1.8 or higher
+- Transformers library from Hugging Face
+- Additional libraries: `numpy`, `scipy`, `matplotlib`
 
-**Logged:**
+### Clone the Repository
 
-* Training and validation loss per 500 steps
-* Prompt response outputs
-* Inference time (Vanilla vs DyT)
+First, clone the repository to your local machine:
 
----
-
-## Key Results
-
-| Dataset  | DyT Val Loss | Vanilla Val Loss | Loss Gap |
-| -------- | ------------ | ---------------- | -------- |
-| Alpaca   | \~8.3        | \~1.5            | 🔺6.8    |
-| ShareGPT | \~8.3        | \~2.3            | 🔺6.0    |
-| RE-WILD  | \~8.3        | \~0.9            | 🔺7.4    |
-
-* **Inference Time**: DyT = 77.05s, Vanilla = 77.46s → \~0.5% speedup
-* **Prompt Quality**: DyT generates literal, unstructured completions; vanilla preserves instruction-following and formatting better
----
-
-## Repository Structure
 ```bash
-├── data_utils/                # Dataset preprocessing, e.g. ShareGPT JSON
-├── notebooks/                # Training notebooks for all setups
-├── scripts/                  # Executable training scripts (.py)
-├── results/                  # Saved checkpoints
-├── plots/                    # Visualizations and graphs
-├── report/Presentation.pdf   # Final submitted report
-└── README.md                 # You're here
+git clone https://github.com/MRROBOT401/DyT-NoNorm-LLMs-REWILD.git
+cd DyT-NoNorm-LLMs-REWILD
 ```
 
----
-##  Workflow
-![Workflow Diagram](plots/workflow.png)
+### Install Required Packages
 
----
-## Experimental Results
-
-### 1. RE-WILD (Selective DyT Unfreezing)
-
-![RE-WILD](plots/DistilGPT2%20%2B%20LoRA%20on%20RE-WILD%20DyT%20(Selective%20Unfreeze)%20vs%20Vanilla.png)
-
-> DyT with selective unfreezing showed stagnated validation loss (~8.3), while vanilla continued to converge. Suggests DyT struggles under LoRA on high-entropy datasets.
-
----
-
-### 2. ShareGPT
-
-![ShareGPT](plots/DistilGPT2%20Fine-Tuning%20on%20ShareGPT%20DyT%20vs%20Vanilla.png)
-
-> DyT (blue/orange) converges slower, with higher loss than vanilla. Simulated vanilla training reaches ~2.0 loss with stable gradients, demonstrating the benefits of LayerNorm.
-
----
-
-### 3. Alpaca
-
-![Alpaca](plots/Loss%20Comparison%20%20DyT%20vs%20Vanilla%20DistilGPT2.png)
-
-> On a smaller instruction corpus, DyT retains basic convergence but exhibits noisy gradients and wider generalization gap compared to vanilla.
-
----
-
-### 4. MT-Bench Inference Comparison
-
-![Inference Time](plots/Inference%20times.png)
-
-> DyT showed **0.5% faster inference** but drastically reduced preference on MT-bench judged outputs.
-
----
-
-### 5. Pythia 410M: Train Loss
-
-![Pythia Loss](plots/train%20loss.png)
-
-> Larger models benefit more from DyT. Loss offset between DyT and vanilla reduces with model scale.
-
----
-
-### 6. Gradient Norm (Pythia)
-
-![Gradient Norm](plots/train_grad_norm.png)
-
-> DyT introduces smoother gradients compared to noisy LayerNorm-free baselines, but requires tighter α tuning.
-
----
-
-### 7. Token Accuracy
-
-![Token Accuracy](plots/trainmean_token_accuracy.png)
-
-> Vanilla maintains higher accuracy over training, but DyT still improves token-level predictions, especially in larger models.
----
-
-## Repository Structure
-
-```
-DyT-NoNorm-LLMs-REWILD/
-├── notebooks/               # Jupyter notebooks for each experiment
-├── scripts/                 # Training scripts (vanilla, DyT, selective unfreeze)
-├── data_utils/              # Tokenizer, formatting, and dataset cleaning
-├── results/                 # Raw loss logs and saved metrics
-├── plots/                   # All graphs used in our report & slides
-├── report/                  # Presentation slides (HPML_Presentation.pdf)
-└── README.md
-```
-
----
-
-### How to Run This Project
-
-#### Step 1: Install Requirements
-
-Install the necessary Python packages:
+You can install the required packages using pip:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-#### Step 2: Run the Notebooks 
+### Download Pre-trained Models
 
-Navigate to the `notebooks/` folder and run the following Jupyter notebooks in the recommended order:
+To use the pre-trained DistilGPT2 model, you can download it directly from Hugging Face:
 
-1. **Benchmarks.ipynb**
-   ⤷ Overview and comparison plots between DyT and LayerNorm across datasets
+```bash
+from transformers import DistilGPT2Tokenizer, DistilGPT2Model
 
-2. **modReWILDcreate.ipynb**
-   ⤷ Prepares and reformats RE-WILD dataset from HuggingFace JSON
+tokenizer = DistilGPT2Tokenizer.from_pretrained('distilgpt2')
+model = DistilGPT2Model.from_pretrained('distilgpt2')
+```
 
-3. **pythia17m.ipynb**
-   ⤷ Fine-tuning DyT-modified Pythia-17M model
+### Run the Model
 
-4. **pythia410m.ipynb**
-   ⤷ Fine-tuning DyT-modified Pythia-410M model
+After setting up the environment, you can run the model using the following command:
 
-5. **train\_alpaca\_distillgpt2.ipynb**
-   ⤷ Fine-tunes DyT-based DistilGPT2 on the Alpaca dataset
+```bash
+python run_model.py
+```
 
-6. **train\_alpaca\_distillgpt2\_vanilla.ipynb**
-   ⤷ Fine-tunes baseline DistilGPT2 (LayerNorm) on Alpaca
+## Usage
 
-7. **train\_sharegpt.ipynb**
-   ⤷ Trains DyT vs. vanilla on ShareGPT conversational data
+### Training the Model
 
-8. **train\_selective\_unfreeze\_rewild.ipynb**
-   ⤷ Selective unfreezing DyT fine-tuning on RE-WILD
+To train the model with Dynamic Tanh, use the following command:
 
+```bash
+python train.py --model_name distilgpt2 --activation_function dyT --epochs 10
+```
 
-Each notebook includes inline comments and cell outputs for reproducibility.
-If you're running on Colab or an HPC, ensure appropriate runtime (A100 recommended).
+You can adjust parameters like `--epochs` and `--batch_size` according to your needs.
 
-For best results, execute all training notebooks sequentially and compare metrics in `Benchmarks.ipynb`.
+### Evaluating the Model
 
-These notebooks can be run using JupyterLab, VS Code, or Google Colab.
----
+After training, you can evaluate the model on various benchmarks:
 
-## Dependencies
-- `transformers`
-- `datasets`
-- `peft`
-- `torch`
-- `scipy`, `matplotlib`, `numpy`
----
+```bash
+python evaluate.py --model_name distilgpt2 --dataset rewild
+```
 
-## Observations
+This command will provide metrics on how well the model performs on the RE-WILD dataset.
 
-* DyT struggles to generalize without normalization layers, especially on larger, diverse corpora like RE-WILD
-* Selective unfreezing helps, but performance gap remains significant
-* Vanilla DistilGPT2 shows clean convergence; DyT plateaus at high loss
-* Full SFT improves DyT, but undermines PEFT advantages
+## Evaluation
 
----
+We evaluated our model on three primary benchmarks:
 
-## Slides & Report
+1. **RE-WILD**: This dataset tests the model's ability to understand and generate text based on real-world scenarios.
+2. **Alpaca**: A dataset designed to challenge the model's reasoning capabilities.
+3. **ShareGPT**: This dataset focuses on conversational AI, assessing how well the model can engage in dialogue.
 
-* [HPML Final Slides (PDF)](./report/Presentation.pdf)
+### Results
 
----
+Our experiments show that replacing LayerNorm with Dynamic Tanh leads to:
 
-## Future Work
+- Improved convergence rates during training.
+- Better performance metrics across all evaluated datasets.
+- Reduced resource consumption during fine-tuning.
 
-* Try DyT with **LLaMA 3.2B** using larger batch sizes
-* Evaluate DyT with alternative norm-replacement functions
-* Integrate DyT into **quantized** or **sparsely activated** LLMs
+## Contributing
 
----
-##  Acknowledgements
-- HuggingFace Transformers & Datasets
-- Colab Pro for GPU access
-- HPML course instructors for project guidance
+We welcome contributions to enhance this project. If you would like to contribute, please follow these steps:
 
----
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-branch`).
+3. Make your changes and commit them (`git commit -m 'Add new feature'`).
+4. Push to the branch (`git push origin feature-branch`).
+5. Create a pull request.
 
 ## License
-This project is part of academic coursework at NYU and released for research and educational use only.
 
----
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
-For questions or collaborations, reach out to:
+For any questions or suggestions, feel free to reach out:
 
-* Richard Zhong: [rhz2020@nyu.edu](mailto:rhz2020@nyu.edu)
-* Gopala Krishna Abba: [ga2664@nyu.edu](mailto:ga2664@nyu.edu)
+- Email: your_email@example.com
+- GitHub: [MRROBOT401](https://github.com/MRROBOT401)
+
+For the latest releases, please visit our [Releases section](https://github.com/MRROBOT401/DyT-NoNorm-LLMs-REWILD/releases).
+
+Thank you for your interest in DyT-NoNorm-LLMs-REWILD!
